@@ -1,7 +1,5 @@
 import requests
 
-from tests.constants import BASE, HEADERS, SSL_VERIFY
-
 # GET /Students/GetStudents
 # GET /Students/GetStudent/{id}
 # GET /Students/GetQuestion/{id}
@@ -9,129 +7,104 @@ from tests.constants import BASE, HEADERS, SSL_VERIFY
 # GET /Students/checkGrade
 
 
-def test_get_students():
-    with requests.Session() as s:
-        route = f"{BASE}/Students/GetStudents"
+def test_get_students(s: requests.Session):
+    route = '/Students/GetStudents'
 
-        # 200
+    # 200
 
-        r = s.get(
-            route,
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route,
+    )
 
-        assert r.status_code == 200
-        data = r.json()
-        assert isinstance(data, list)
+    assert r.status_code == 200
+    data = r.json()
+    assert isinstance(data, list)
 
 
-def test_get_student_id():
-    with requests.Session() as s:
-        route = "{base}/Students/GetStudent/{id}"
+def test_get_student_id(s: requests.Session):
+    route = '/Students/GetStudent/{id}'
 
-        # get all
+    # get all
 
-        r = s.get(
-            f"{BASE}/Students/GetStudents",
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        '/Students/GetStudents',
+    )
 
-        assert r.status_code == 200
-        db_data = r.json()
+    assert r.status_code == 200
+    db_data = r.json()
 
-        # 200
+    # 200
 
-        r = s.get(
-            route.format(base=BASE, id=105),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=105),
+    )
 
-        assert r.status_code == 200
-        data = r.json()
-        assert data in db_data
+    assert r.status_code == 200
+    data = r.json()
+    assert data in db_data
 
-        # 404
+    # 404
 
-        r = s.get(
-            route.format(base=BASE, id=10000000),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=10000000),
+    )
 
-        assert r.status_code == 404
+    assert r.status_code == 404
 
 
-def test_get_question_id():
-    with requests.Session() as s:
-        route = "{base}/Students/GetQuestion/{id}"
+def test_get_question_id(s: requests.Session):
+    route = '/Students/GetQuestion/{id}'
 
-        # 200
+    # 200
 
-        r = s.get(
-            route.format(base=BASE, id=5670010718),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=5670010718),
+    )
 
-        assert r.status_code == 200
+    assert r.status_code == 200
 
-        # 404
+    # 404
 
-        r = s.get(
-            route.format(base=BASE, id=0),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=0),
+    )
 
 
-def test_get_request_id():
-    with requests.Session() as s:
-        route = "{base}/Students/GetRequest/{id}"
+def test_get_request_id(s: requests.Session):
+    route = '/Students/GetRequest/{id}'
 
-        # 200
+    # 200
 
-        r = s.get(
-            route.format(base=BASE, id=5670010718),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=5670010718),
+    )
 
-        assert r.status_code == 200
+    assert r.status_code == 200
 
-        # 404
+    # 404
 
-        r = s.get(
-            route.format(base=BASE, id=0),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=0),
+    )
 
 
-def test_check_grade():
-    with requests.Session() as s:
-        route = "{base}/Students/checkGrade/{id}"
+def test_check_grade(s: requests.Session):
+    route = '/Students/checkGrade/{id}'
 
-        # 200
+    # 200
 
-        r = s.get(
-            route.format(base=BASE, id=5670010718),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=5670010718),
+    )
 
-        assert r.status_code == 200
-        data = r.json()
-        assert data == False
+    assert r.status_code == 200
+    data = r.json()
+    assert data == False
 
-        # 404
+    # 404
 
-        r = s.get(
-            route.format(base=BASE, id=0),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get(
+        route.format(id=0),
+    )
 
-        assert r.status_code == 404
+    assert r.status_code == 404

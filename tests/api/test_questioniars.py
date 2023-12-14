@@ -1,8 +1,6 @@
 import pytest
 import requests
 
-from tests.constants import BASE, HEADERS, SSL_VERIFY
-
 # GET /Questioniars/GetQuestioniars
 # GET /Questioniars/GetQuestioniar/{id}
 # POST /Questioniars/UploadImage/upload
@@ -11,216 +9,180 @@ from tests.constants import BASE, HEADERS, SSL_VERIFY
 # PUT /Questioniars/InactiveQuestioniar/{id}
 
 
-def test_get_questioniars():
-    with requests.Session() as s:
-        route = f"{BASE}/Questioniars/GetQuestioniars"
+def test_get_questioniars(s: requests.Session):
+    route = '/Questioniars/GetQuestioniars'
 
-        # 200
+    # 200
 
+    r = s.get(
+        route,
+    )
+
+    assert r.status_code == 200
+    data = r.json()
+    for i in data:
+        assert 'questId' in i
+        assert 'questTopic' in i
+        assert 'questDescription' in i
+        assert 'questUpload' in i
+        assert 'questLink' in i
+        assert 'questTerm' in i
+        assert 'questType' in i
+        assert 'questDepartment' in i
+        assert 'questStatus' in i
+        assert 'questCreateDate' in i
+        assert 'questDateStart' in i
+        assert 'questDateEnd' in i
+        assert 'questCreateBy' in i
+        assert 'qeustDiploma' in i
+        assert 'questBachelor' in i
+        assert 'questMaster' in i
+        assert 'questDoctor' in i
+
+
+def test_get_questioniar_id(s: requests.Session):
+    route = '/Questioniars/GetQuestioniar/{id}'
+
+    # get all
+
+    r = s.get(
+        '/Questioniars/GetQuestioniars',
+    )
+
+    assert r.status_code == 200
+    db_data = r.json()
+
+    # 200
+
+    for i in db_data:
+        queue_id = i['questId']
         r = s.get(
-            route,
-            headers=HEADERS,
-            verify=SSL_VERIFY,
+            route.format(id=queue_id),
         )
 
         assert r.status_code == 200
         data = r.json()
-        for i in data:
-            assert 'questId' in i
-            assert 'questTopic' in i
-            assert 'questDescription' in i
-            assert 'questUpload' in i
-            assert 'questLink' in i
-            assert 'questTerm' in i
-            assert 'questType' in i
-            assert 'questDepartment' in i
-            assert 'questStatus' in i
-            assert 'questCreateDate' in i
-            assert 'questDateStart' in i
-            assert 'questDateEnd' in i
-            assert 'questCreateBy' in i
-            assert 'qeustDiploma' in i
-            assert 'questBachelor' in i
-            assert 'questMaster' in i
-            assert 'questDoctor' in i
+        assert data == i
+
+    # 404
+
+    r = s.get(
+        route.format(id=0),
+    )
+
+    assert r.status_code == 404
 
 
-def test_get_questioniar_id():
-    with requests.Session() as s:
-        route = "{base}/Questioniars/GetQuestioniar/{id}"
+def test_post_upload_image(s: requests.Session):
+    route = '/Questioniars/UploadImage/upload?id={id}'
 
-        # get all
+    # get all
 
-        r = s.get(
-            f"{BASE}/Questioniars/GetQuestioniars",
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    r = s.get('/Questioniars/GetQuestioniars')
 
-        assert r.status_code == 200
-        db_data = r.json()
+    assert r.status_code == 200
+    db_data = r.json()
 
-        # 200
+    # 200
 
-        for i in db_data:
-            queue_id = i["questId"]
-            r = s.get(
-                route.format(base=BASE, id=queue_id),
-                headers=HEADERS,
-                verify=SSL_VERIFY,
-            )
-
-            assert r.status_code == 200
-            data = r.json()
-            assert data == i
-
-        # 404
-
-        r = s.get(
-            route.format(base=BASE, id=0),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
-
-        assert r.status_code == 404
-
-
-def test_post_upload_image():
-    with requests.Session() as s:
-        route = "{base}/Questioniars/UploadImage/upload?id={id}"
-
-        # get all
-
-        r = s.get(
-            f"{BASE}/Questioniars/GetQuestioniars",
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
-
-        assert r.status_code == 200
-        db_data = r.json()
-
-        # 200
-
-        for q in db_data:
-            r = s.post(
-                route.format(base=BASE, id=q['questId']),
-                headers=HEADERS,
-                files={
-                    "file": open("images/test.png", "rb"),
-                },
-                verify=SSL_VERIFY,
-            )
-
-            assert r.status_code == 200
-            break
-
-        # 404
-
+    for q in db_data:
         r = s.post(
-            route.format(base=BASE, id=0),
-            headers=HEADERS,
+            route.format(id=q['questId']),
             files={
-                "file": open("images/test.png", "rb"),
+                'file': open('images/test.png', 'rb'),
             },
-            verify=SSL_VERIFY,
-        )
-
-        assert r.status_code == 404
-
-        # 400
-
-        for q in db_data:
-            r = s.post(
-                route.format(base=BASE, id=q['questId']),
-                headers=HEADERS,
-                verify=SSL_VERIFY,
-            )
-
-            assert r.status_code == 400
-            break
-
-
-def test_put_questioniar_id():
-    with requests.Session() as s:
-        route = "{base}/Questioniars/PutQuestioniar/{id}"
-
-        # get all
-
-        r = s.get(
-            f"{BASE}/Questioniars/GetQuestioniars",
-            headers=HEADERS,
-            verify=SSL_VERIFY,
         )
 
         assert r.status_code == 200
-        db_data = r.json()
+        break
 
-        # 200
-        payload = {}
-        for payload in db_data:
-            r = s.put(
-                route.format(base=BASE, id=payload['questId']),
-                headers=HEADERS,
-                verify=SSL_VERIFY,
-                json=payload,
-            )
+    # 404
 
-            assert r.status_code == 204
-            break
+    r = s.post(
+        route.format(id=0),
+        files={
+            'file': open('images/test.png', 'rb'),
+        },
+    )
 
-        # 404
+    assert r.status_code == 404
 
-        payload['questId'] = 0
-        r = s.put(
-            route.format(base=BASE, id=payload['questId']),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-            json=payload,
-        )
+    # 400
 
-        assert r.status_code == 404
-
-
-def test_post_questioniar():
-    with requests.Session() as s:
-        route = f"{BASE}/Questioniars/PostQuestioniar"
-
-        payload = {"questTopic": "string"}
-
+    for q in db_data:
         r = s.post(
-            route,
-            headers=HEADERS,
-            verify=SSL_VERIFY,
+            route.format(id=q['questId']),
+        )
+
+        assert r.status_code == 400
+        break
+
+
+def test_put_questioniar_id(s: requests.Session):
+    route = '/Questioniars/PutQuestioniar/{id}'
+
+    # get all
+
+    r = s.get(
+        '/Questioniars/GetQuestioniars',
+    )
+
+    assert r.status_code == 200
+    db_data = r.json()
+
+    # 200
+    payload = {}
+    for payload in db_data:
+        r = s.put(
+            route.format(id=payload['questId']),
             json=payload,
         )
 
-        assert r.status_code == 201
-        # data = r.json()
+        assert r.status_code == 204
+        break
+
+    # 404
+
+    payload['questId'] = 0
+    r = s.put(
+        route.format(id=payload['questId']),
+        json=payload,
+    )
+
+    assert r.status_code == 404
 
 
-@pytest.mark.skip(reason="this route is not used")
-def test_put_inactive_questioniar_id():
-    with requests.Session() as s:
-        route = "{base}/Questioniars/InactiveQuestioniar/{id}"
+def test_post_questioniar(s: requests.Session):
+    route = f'/Questioniars/PostQuestioniar'
 
-        r = s.put(
-            route.format(base=BASE, id=12),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
+    payload = {'questTopic': 'string'}
 
-        assert r.status_code == 200
+    r = s.post(
+        route,
+        json=payload,
+    )
 
-        # fetch again
+    assert r.status_code == 201
+    # data = r.json()
 
-        r = s.get(
-            "{base}/Questioniars/GetQuestioniar/{id}".format(base=BASE, id=12),
-            headers=HEADERS,
-            verify=SSL_VERIFY,
-        )
 
-        assert r.status_code == 200
+@pytest.mark.skip(reason='this route is not used')
+def test_put_inactive_questioniar_id(s: requests.Session):
+    route = '/Questioniars/InactiveQuestioniar/{id}'
 
-        data = r.json()
-        assert data["questStatus"] in ["Inactive", "string"]
+    r = s.put(
+        route.format(id=12),
+    )
+
+    assert r.status_code == 200
+
+    # fetch again
+
+    r = s.get(
+        '/Questioniars/GetQuestioniar/{id}'.format(id=12),
+    )
+
+    assert r.status_code == 200
+
+    data = r.json()
+    assert data['questStatus'] in ['Inactive', 'string']
