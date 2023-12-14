@@ -9,7 +9,6 @@ from tests.constants import BASE, HEADERS
 
 @pytest.mark.skip(reason="this route is not used")
 def test_get_roles():
-    return
     with requests.Session() as s:
         route = f"{BASE}/Roles/GetRoles"
 
