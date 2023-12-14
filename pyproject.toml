@@ -1,0 +1,34 @@
+[tool.black]
+line-length = 125
+skip-string-normalization = true
+target-version = ["py312"]
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.pytest_cache
+  | venv
+)/
+'''
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+combine_star = true
+line_length = 125
+skip = ["venv", ".venv", ".pytest_cache", ".git"]
+
+[tool.pyright]
+include = [
+  "tests"
+]
+exclude = [
+  "**/__pycache__",
+]
+reportUnnecessaryTypeIgnoreComment = "warning"
+reportUnusedImport = "error"
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
+
+[tool.pytest.ini_options]
+addopts = "-v -p no:warnings"
